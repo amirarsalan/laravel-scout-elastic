@@ -135,15 +135,27 @@ class ElasticsearchEngine extends Engine
         $params = [
             'index' => $this->index,
             'type' => $builder->index ?: $builder->model->searchableAs(),
-            'body' => [
+        ];
+
+        if ($builder->query) {
+            $params['body'] = [
                 'query' => [
                     'bool' => [
                         'must' => [
                             ['fuzzy' => [ '_all' => $builder->query]]]
                     ]
                 ]
-            ]
-        ];
+            ];
+        } else {
+            $params['body'] = [
+                'query' => [
+                    'bool' => [
+                        'must' => [
+                            ['query_string' => [ 'query' => "*{$builder->query}*"]]]
+                    ]
+                ]
+            ];
+        }
 
         if ($sort = $this->sort($builder)) {
             $params['body']['sort'] = $sort;
