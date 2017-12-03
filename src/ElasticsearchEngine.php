@@ -142,7 +142,21 @@ class ElasticsearchEngine extends Engine
                 'query' => [
                     'bool' => [
                         'must' => [
-                            ['fuzzy' => [ '_all' => $builder->query]]]
+                            [
+                                'fuzzy' =>
+                                    [
+                                        'name' => [
+                                            'value' => $builder->query,
+                                            'boost' => 10
+                                        ]
+                                    ],
+                            ],
+                            [
+                                'fuzzy' => [
+                                    '_all' => $builder->query
+                                ]
+                            ]
+                        ]
                     ]
                 ]
             ];
