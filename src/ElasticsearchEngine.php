@@ -144,7 +144,7 @@ class ElasticsearchEngine extends Engine
                         'must' => [
                             [
                                 'query_string' => [
-                                    'query' => "(title:{$builder->query})^10 OR ({$builder->query})^3 OR ({$builder->query}~2)^2",
+                                    'query' => "(name:{$builder->query})^10 OR ({$builder->query})^3 OR (name:{$builder->query}~1)^2",
                                 ]
                             ],
                         ]
