@@ -123,6 +123,15 @@ class ElasticsearchEngine extends Engine
         return $result;
     }
 
+    function escapeElasticSearchReservedChars($string) {
+        $regex = "/[\\+\\-\\=\\&\\|\\!\\(\\)\\{\\}\\[\\]\\^\\\"\\~\\*\\<\\>\\?\\:\\\\\\/]/";
+        $string = preg_replace_callback ($regex, 
+            function ($matches) {
+                return "\\" . $matches[0]; 
+            }, $string);
+        return $string;
+    }
+
     /**
      * Perform the given search on the engine.
      *
@@ -137,6 +146,8 @@ class ElasticsearchEngine extends Engine
             'type' => $builder->index ?: $builder->model->searchableAs(),
         ];
 
+        $query = $this->escapeElasticSearchReservedChars($builder->query);
+
         if ($builder->query) {
             $params['body'] = [
                 'query' => [
@@ -144,7 +155,7 @@ class ElasticsearchEngine extends Engine
                         'must' => [
                             [
                                 'query_string' => [
-                                    'query' => "(name:{$builder->query})^10 OR ({$builder->query})^3 OR (name:{$builder->query}~1)^2",
+                                    'query' => "(name:(\"{$query}\"))^10 OR (name:({$query}~1))^2",
                                 ]
                             ],
                         ]
