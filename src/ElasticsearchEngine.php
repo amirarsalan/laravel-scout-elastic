@@ -147,6 +147,7 @@ class ElasticsearchEngine extends Engine
         ];
 
         $query = $this->escapeElasticSearchReservedChars($builder->query);
+        $query_backup = str_replace(' ', '*', $query);
 
         if ($builder->query) {
             $params['body'] = [
@@ -155,7 +156,7 @@ class ElasticsearchEngine extends Engine
                         'must' => [
                             [
                                 'query_string' => [
-                                    'query' => "(name:(\"{$query}\"))^10 OR (name:({$query}~1))^2",
+                                    'query' => "(name:(\"{$query}\"))^10 OR (name:(*{$query}*))^8 OR (name:({$query_backup}))^6 OR (name:({$query}~1))^2",
                                 ]
                             ],
                         ]
